@@ -9,12 +9,26 @@ TTF_Font *font = nullptr;
 Texture p1Text, p2Text;
 Texture finish;
 
+Texture pawnSheet;
+SDL_Rect bluePawn[4] = { 0, 0, 40, 40 };
+SDL_Rect greenPawn[4] = { 80, 0, 40, 40 };
+
 SDL_Rect tile[52];
+
+SDL_Rect redStartSquares[4]; //Here
+SDL_Rect greenStartSquares[4];
+SDL_Rect blueStartSquares[4];
+SDL_Rect yellowStartSquares[4];
 
 SDL_Rect red = { 0, 0, 240, 240 };
 SDL_Rect green = { 360, 0, 240, 240 };
 SDL_Rect blue = { 0, 360, 240, 240 };
 SDL_Rect yellow = { 360, 360, 240, 240 };
+
+SDL_Rect redStart = { 50, 50, 140, 140 };
+SDL_Rect greenStart = { 410, 50, 140, 140 };
+SDL_Rect blueStart = { 50, 410, 140, 140 };
+SDL_Rect yellowStart = { 410, 410, 140, 140 };
 
 SDL_Rect blueHome[5];
 SDL_Rect redHome[5];
@@ -136,6 +150,24 @@ void initBoard()
 	temp = 9;
 	for (int i = 0; i < 5; i++)
 		yellowHome[i] = { temp * 40, 280, 40, 40 }, temp++;
+
+	//Starting Points
+	blueStartSquares[0] = { 65, 490, 40, 40 };
+	blueStartSquares[1] = { 135, 490, 40, 40 };
+	blueStartSquares[2] = { 65, 425, 40, 40 };
+	blueStartSquares[3] = { 135, 425, 40, 40 };
+
+	greenStartSquares[0] = { 490, 65, 40, 40 };
+	greenStartSquares[1] = { 490, 135, 40, 40 };
+	greenStartSquares[2] = { 425, 65, 40, 40 };
+	greenStartSquares[3] = { 425, 135, 40, 40 };
+
+	//Pawns
+	for (int i = 0; i < 4; i++)
+	{
+		bluePawn[i] = { 0, 0, 40, 40 };
+		greenPawn[i] = { 80, 0, 40, 40 };
+	}
 }
 
 bool init()
@@ -162,6 +194,7 @@ bool init()
 bool loadMedia()
 {
 	if (!finish.loadTexture(renderer, "Images/Finish.png")) return false;
+	if (!pawnSheet.loadTexture(renderer, "Images/Pawns.png")) return false;
 
 	font = TTF_OpenFont("Fonts/Antaro.ttf", 28);
 	if (font == NULL) return false;
@@ -204,6 +237,13 @@ void drawBoard()
 	SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 	SDL_RenderFillRect(renderer, &yellow);
 
+	//Draw Start
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderFillRect(renderer, &blueStart);
+	SDL_RenderFillRect(renderer, &redStart);
+	SDL_RenderFillRect(renderer, &greenStart);
+	SDL_RenderFillRect(renderer, &yellowStart);
+	
 	//Draw Home and Finish
 	SDL_SetRenderDrawColor(renderer, 0, 122, 255, 255);
 	for (int i = 0; i < 5; i++)
@@ -220,11 +260,12 @@ void drawBoard()
 	SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 	for (int i = 0; i < 5; i++)
 		SDL_RenderFillRect(renderer, &yellowHome[i]);
-
+	
 	finish.draw(renderer, 240, 240);
 
 	//Draw Tiles
 	SDL_SetRenderDrawColor(renderer, 0, 122, 255, 255);
+	SDL_RenderDrawRect(renderer, &tile[0]);
 	SDL_RenderFillRect(renderer, &tile[2]);
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &tile[15]);
@@ -237,7 +278,7 @@ void drawBoard()
 	for (int i = 0; i < 52; i++)
 		SDL_RenderDrawRect(renderer, &tile[i]);
 
-	//Draw 
+	//Draw Home
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	for (int i = 0; i < 5; i++)
 	{
@@ -245,5 +286,16 @@ void drawBoard()
 		SDL_RenderDrawRect(renderer, &redHome[i]);
 		SDL_RenderDrawRect(renderer, &greenHome[i]);
 		SDL_RenderDrawRect(renderer, &yellowHome[i]);
+	}
+
+	//Draw Text
+	p1Text.draw(renderer, 75, 565);
+	p2Text.draw(renderer, 435, 15);
+
+	//Draw Pawns
+	for (int i = 0; i < 4; i++)
+	{
+		pawnSheet.draw(renderer, blueStartSquares[i].x, blueStartSquares[i].y, &bluePawn[i]);
+		pawnSheet.draw(renderer, greenStartSquares[i].x, greenStartSquares[i].y, &greenPawn[i]);
 	}
 }
