@@ -72,25 +72,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;C:\Development\Coding\Games\Ludo\Ludo\source\headers;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;C:\Development\Coding\Games\Ludo\Ludo\source\headers;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;C:\Development\Coding\Games\Ludo\Ludo\source\headers;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\include;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\include;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\include;C:\Development\Coding\Games\Ludo\Ludo\source\headers;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Development\Coding\Extension Libraries\SDL\SDL2_ttf-2.0.15\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2_image-2.0.4\lib\x86;C:\Development\Coding\Extension Libraries\SDL\SDL2-2.0.9\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -154,11 +154,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="source\headers\Board.h" />
+    <ClInclude Include="source\headers\Pawn.h" />
+    <ClInclude Include="source\headers\Player.h" />
+    <ClInclude Include="source\headers\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="source\src\Board.cpp" />
+    <ClCompile Include="source\src\main.cpp" />
+    <ClCompile Include="source\src\Player.cpp" />
+    <ClCompile Include="source\src\Texture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
