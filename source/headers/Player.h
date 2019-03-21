@@ -6,7 +6,7 @@
 class Player
 {
 	public:
-		Player(char colour);
+		Player(Board &board, char colour);
 		void rollDie(Board &board);
 
 		Pawn pawn[4];

@@ -12,8 +12,8 @@ SDL_Renderer *renderer = nullptr;
 TTF_Font *font = nullptr;
 Texture p1Text, p2Text;
 
-Player p1('b'), p2('g');
 Board board;
+Player p1(board, 'b'), p2(board, 'g');
 
 Texture pawnSheet;
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 							running = false;
 							break;
 
-						case SDLK_d:
+						case SDLK_z:
 							p1.rollDie(board);
 							break;
 					}

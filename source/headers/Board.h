@@ -27,10 +27,10 @@ class Board
 		SDL_Rect blueStart = { 50, 410, 140, 140 };
 		SDL_Rect yellowStart = { 410, 410, 140, 140 };
 
-		SDL_Rect blueHome[5];
-		SDL_Rect redHome[5];
-		SDL_Rect greenHome[5];
-		SDL_Rect yellowHome[5];
+		SDL_Rect blueHome[6];
+		SDL_Rect redHome[6];
+		SDL_Rect greenHome[6];
+		SDL_Rect yellowHome[6];
 
 		SDL_Rect blueFinish = { 0, 0, 40, 40 };
 		SDL_Rect redFinish = { 0, 0, 40, 40 };

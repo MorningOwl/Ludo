@@ -47,20 +47,20 @@ Board::Board()
 
 	//Home
 	temp = 13;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 		blueHome[i] = { 280, temp * 40, 40, 40 }, temp--;
 
 	temp = 1;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 		redHome[i] = { temp * 40, 280, 40, 40 }, temp++;
 
 	temp = 1;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 		greenHome[i] = { 280, temp * 40, 40, 40 }, temp++;
 
-	temp = 9;
-	for (int i = 0; i < 5; i++)
-		yellowHome[i] = { temp * 40, 280, 40, 40 }, temp++;
+	temp = 13;
+	for (int i = 0; i < 6; i++)
+		yellowHome[i] = { temp * 40, 280, 40, 40 }, temp--;
 
 
 	//Starting Points
