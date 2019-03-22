@@ -7,6 +7,7 @@
 Player::Player(Board &board, char colour) : colour(colour)
 {
 	numPawnsOut = 0;
+	rollDice = false;
 
 	switch (colour)
 	{
@@ -49,6 +50,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 	{
 		pawn[i].p_status = START;
 		pawn[i].p_endingTileRect = board.tile[pawn[i].p_endingTileNum];
+		pawn[i].p_numTilesMoved = 0;
 	}
 }
 
@@ -103,7 +105,8 @@ Player::Player(Board &board, char colour) : colour(colour)
 void Player::rollDie(Board &board)
 {
 	srand(time(0));
-	roll = 1;
+	roll = 1 + rand() % 6;
+	rollDice = true;
 
 	switch (numPawnsOut)
 	{
@@ -122,11 +125,11 @@ void Player::rollDie(Board &board)
 			switch (pawn[0].p_status)
 			{
 				case OUT:
-					pawn[0].p_currentTileNum += roll;
+					pawn[0].p_currentTileNum++;
 					break;
 
 				case HOME:
-					pawn[0].p_currentTileNum += roll;
+					pawn[0].p_currentTileNum++;
 					break;
 			}
 
@@ -192,6 +195,25 @@ void Player::update(Board &board)
 			else if (dest >= board.numTiles)
 				pawn[0].p_currentTileNum = 0;
 
+
+			//Moving more than one tile
+			if (pawn[0].p_currentPositionRect.x == board.tile[dest].x && pawn[0].p_currentPositionRect.y == board.tile[dest].y
+				&& rollDice && dest != pawn[0].p_startingTileNum)
+			{
+				pawn[0].p_numTilesMoved++;
+				if (pawn[0].p_numTilesMoved < roll)
+				{
+					SDL_Delay(50);
+					pawn[0].p_currentTileNum++;
+				}
+
+				else
+				{
+					pawn[0].p_numTilesMoved = 0;
+					rollDice = false;
+				}
+			}
+
 			break;
 
 		case ENDINGTILE:
@@ -212,6 +234,25 @@ void Player::update(Board &board)
 
 					if (pawn[0].p_currentPositionRect.x == board.blueHome[5].x && pawn[0].p_currentPositionRect.y == board.blueHome[5].y)
 						pawn[0].p_status = DONE;
+
+
+					//Moving more than one tile
+					if (pawn[0].p_currentPositionRect.x == board.blueHome[dest].x && pawn[0].p_currentPositionRect.y == board.blueHome[dest].y
+						&& rollDice && dest != pawn[0].p_startingTileNum)
+					{
+						pawn[0].p_numTilesMoved++;
+						if (pawn[0].p_numTilesMoved < roll)
+						{
+							SDL_Delay(50);
+							pawn[0].p_currentTileNum++;
+						}
+
+						else
+						{
+							pawn[0].p_numTilesMoved = 0;
+							rollDice = false;
+						}
+					}
 					break;
 
 				case 'g':
@@ -220,9 +261,26 @@ void Player::update(Board &board)
 
 					if (pawn[0].p_currentPositionRect.x == board.greenHome[5].x && pawn[0].p_currentPositionRect.y == board.greenHome[5].y)
 						pawn[0].p_status = DONE;
+
+
+					//Moving more than one tile
+					if (pawn[0].p_currentPositionRect.x == board.greenHome[dest].x && pawn[0].p_currentPositionRect.y == board.greenHome[dest].y
+						&& rollDice && dest != pawn[0].p_startingTileNum)
+					{
+						pawn[0].p_numTilesMoved++;
+						if (pawn[0].p_numTilesMoved < roll)
+						{
+							SDL_Delay(50);
+							pawn[0].p_currentTileNum++;
+						}
+
+						else
+						{
+							pawn[0].p_numTilesMoved = 0;
+							rollDice = false;
+						}
+					}
 					break;
 			}
 	}
-
-	
 }

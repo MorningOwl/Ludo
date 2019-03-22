@@ -15,7 +15,7 @@ class Pawn
 		SDL_Rect p_currentPositionRect;
 		SDL_Rect p_endingTileRect;
 
-		int p_destination;
+		int p_numTilesMoved;
 
 		int p_currentTileNum;
 		int p_startingTileNum, p_endingTileNum;

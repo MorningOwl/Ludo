@@ -14,4 +14,6 @@ class Player
 		int numPawnsOut;
 		int roll;
 		char colour;
+
+		bool rollDice;
 };
