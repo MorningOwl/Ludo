@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
 						case SDLK_z:
 							p1.rollDie(board);
 							break;
+
+						case SDLK_x:
+							p2.rollDie(board);
+							break;
 					}
 			}
 		}
@@ -66,6 +70,8 @@ int main(int argc, char *argv[])
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(renderer);
 
+		p1.update(board);
+		p2.update(board);
 		drawBoard();
 
 		SDL_RenderPresent(renderer);
@@ -88,26 +94,26 @@ void initBoard()
 		switch (p1.colour)
 		{
 			case 'b':
-				p1.pawn[i].body = { 0, 0, 40, 40 };
-				p1.pawn[i].currentPosition = board.blueStartSquares[i];
+				p1.pawn[i].p_body = { 0, 0, 40, 40 };
+				p1.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 				break;
 
 			case 'g':
-				p1.pawn[i].body = { 80, 0, 40, 40 };
-				p1.pawn[i].currentPosition = board.greenStartSquares[i];
+				p1.pawn[i].p_body = { 80, 0, 40, 40 };
+				p1.pawn[i].p_currentPositionRect = board.greenStartSquares[i];
 				break;
 		}
 		
 		switch (p2.colour)
 		{
 			case 'b':
-				p2.pawn[i].body = { 0, 0, 40, 40 };
-				p2.pawn[i].currentPosition = board.blueStartSquares[i];
+				p2.pawn[i].p_body = { 0, 0, 40, 40 };
+				p2.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 				break;
 
 			case 'g':
-				p2.pawn[i].body = { 80, 0, 40, 40 };
-				p2.pawn[i].currentPosition = board.greenStartSquares[i];
+				p2.pawn[i].p_body = { 80, 0, 40, 40 };
+				p2.pawn[i].p_currentPositionRect= board.greenStartSquares[i];
 				break;
 		}
 	}
@@ -176,7 +182,7 @@ void drawBoard()
 	//Draw Pawns
 	for (int i = 0; i < 4; i++)
 	{
-		pawnSheet.draw(renderer, p1.pawn[i].currentPosition.x, p1.pawn[i].currentPosition.y, &p1.pawn[i].body);
-		pawnSheet.draw(renderer, p2.pawn[i].currentPosition.x, p2.pawn[i].currentPosition.y, &p2.pawn[i].body);
+		pawnSheet.draw(renderer, p1.pawn[i].p_currentPositionRect.x, p1.pawn[i].p_currentPositionRect.y, &p1.pawn[i].p_body);
+		pawnSheet.draw(renderer, p2.pawn[i].p_currentPositionRect.x, p2.pawn[i].p_currentPositionRect.y, &p2.pawn[i].p_body);
 	}
 }

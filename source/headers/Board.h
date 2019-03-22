@@ -10,6 +10,7 @@ class Board
 		void draw(SDL_Renderer *renderer);
 
 		SDL_Rect tile[52];
+		int numTiles = 52;
 		Texture finish;
 
 		SDL_Rect redStartSquares[4];

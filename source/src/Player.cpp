@@ -8,88 +8,221 @@ Player::Player(Board &board, char colour) : colour(colour)
 {
 	numPawnsOut = 0;
 
-	for (int i = 0; i < 4; i++)
-	{
-		pawn[i].isHome = false;
-		pawn[i].isDone = false;
-	}
-
 	switch (colour)
 	{
 		case 'b':
-			pawn[0].startingPoint = { 65, 490, 40, 40 };
-			pawn[1].startingPoint = { 135, 490, 40, 40 };
-			pawn[2].startingPoint = { 65, 425, 40, 40 };
-			pawn[3].startingPoint = { 135, 425, 40, 40 };
+			pawn[0].p_startingPointRect = { 65, 490, 40, 40 };
+			pawn[1].p_startingPointRect = { 135, 490, 40, 40 };
+			pawn[2].p_startingPointRect = { 65, 425, 40, 40 };
+			pawn[3].p_startingPointRect = { 135, 425, 40, 40 };
 
 			for (int i = 0; i < 4; i++)
 			{
-				pawn[i].startingTile = 2;
-				pawn[i].endingTile = 52;
+				pawn[i].p_startingTileNum = 2;
+				pawn[i].p_endingTileNum = 0;
 
 				for (int j = 0; j < 6; j++)
-					pawn[i].home[j] = board.blueHome[j];
+					pawn[i].p_home[j] = board.blueHome[j];
 			}
 
 			break;
 
 		case 'g':
-			pawn[0].startingPoint = { 490, 65, 40, 40 };
-			pawn[1].startingPoint = { 490, 135, 40, 40 };
-			pawn[2].startingPoint = { 425, 65, 40, 40 };
-			pawn[3].startingPoint = { 425, 135, 40, 40 };
+			pawn[0].p_startingPointRect = { 490, 65, 40, 40 };
+			pawn[1].p_startingPointRect = { 490, 135, 40, 40 };
+			pawn[2].p_startingPointRect = { 425, 65, 40, 40 };
+			pawn[3].p_startingPointRect = { 425, 135, 40, 40 };
 
 			for (int i = 0; i < 4; i++)
 			{
-				pawn[i].startingTile = 28;
+				pawn[i].p_startingTileNum = 28;
+				pawn[i].p_endingTileNum = 26;
 
 				for (int j = 0; j < 5; j++)
-					pawn[i].home[j] = board.greenHome[j];
+					pawn[i].p_home[j] = board.greenHome[j];
+			}
+
+			break;
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		pawn[i].p_status = START;
+		pawn[i].p_endingTileRect = board.tile[pawn[i].p_endingTileNum];
+	}
+}
+
+//void Player::rollDie(Board &board)
+//{
+//	srand(time(0));
+//	roll = 1;// +rand() % 3;
+//
+//	switch (numPawnsOut)
+//	{
+//		case 0:
+//			//if (roll != 6)
+//			//	return;
+//
+//			pawn[0].p_currentTileNum = pawn[0].p_startingTileNum;
+//			pawn[0].p_destination = pawn[0].p_startingTileNum;
+//
+//			pawn[0].p_isOut = true;
+//			numPawnsOut++;
+//			pawn[0].p_currentPositionRect = board.tile[pawn[0].p_currentTileNum];
+//			break;
+//
+//		default:
+//			if (pawn[0].p_currentTileNum + roll >= pawn[0].p_endingTileNum || pawn[0].p_isHome)
+//			{
+//				if (pawn[0].p_isHome)
+//				{
+//					if (pawn[0].p_currentTileNum + roll > 5)
+//						break;
+//
+//					pawn[0].p_currentTileNum += roll;
+//					pawn[0].p_currentPositionRect = pawn[0].p_home[pawn[0].p_currentTileNum];
+//					pawn[0].p_isDone = true;
+//					numPawnsOut--;
+//					break;
+//				}
+//
+//				pawn[0].p_isHome = true;
+//				pawn[0].p_currentTileNum = pawn[0].p_currentTileNum + roll - pawn[0].p_endingTileNum;
+//				pawn[0].p_currentPositionRect = pawn[0].p_home[pawn[0].p_currentTileNum];
+//				break;
+//			}
+//
+//			pawn[0].p_destination = pawn[0].p_currentTileNum + roll;
+//
+//			//pawn[0].p_currentTileNum += roll;
+//			//pawn[0].currentPosition = board.tile[pawn[0].p_currentTileNum];
+//			break;
+//	}
+//}
+
+void Player::rollDie(Board &board)
+{
+	srand(time(0));
+	roll = 1;
+
+	switch (numPawnsOut)
+	{
+		case 0:
+			//if (roll != 6)
+			//	return;
+
+			pawn[0].p_currentPositionRect = board.tile[pawn[0].p_startingTileNum];
+			pawn[0].p_currentTileNum = pawn[0].p_startingTileNum;
+
+			pawn[0].p_status = OUT;
+			numPawnsOut++;
+			break;
+
+		case 1:
+			switch (pawn[0].p_status)
+			{
+				case OUT:
+					pawn[0].p_currentTileNum += roll;
+					break;
+
+				case HOME:
+					pawn[0].p_currentTileNum += roll;
+					break;
 			}
 
 			break;
 	}
 }
 
-void Player::rollDie(Board &board)
+void Player::update(Board &board)
 {
-	srand(time(0));
-	int roll = 1 + rand() % 6;
+	int dest = pawn[0].p_currentTileNum;
 
-	switch (numPawnsOut)
+	switch (pawn[0].p_status)
 	{
-		case 0:
-			if (roll != 6)
-				return;
-
-			pawn[0].currentTile = pawn[0].startingTile;
-			numPawnsOut++;
-			pawn[0].currentPosition = board.tile[pawn[0].currentTile];
-			break;
-
-		default:
-			if (pawn[0].currentTile + roll >= pawn[0].endingTile || pawn[0].isHome)
+		case OUT:
+			if (dest == pawn[0].p_endingTileNum + 1)
 			{
-				if (pawn[0].isHome)
-				{
-					if (pawn[0].currentTile + roll > 5)
-						break;
-
-					pawn[0].currentTile += roll;
-					pawn[0].currentPosition = pawn[0].home[pawn[0].currentTile];
-					pawn[0].isDone = true;
-					numPawnsOut--;
-					break;
-				}
-
-				pawn[0].isHome = true;
-				pawn[0].currentTile = pawn[0].currentTile + roll - pawn[0].endingTile;
-				pawn[0].currentPosition = pawn[0].home[pawn[0].currentTile];
+				pawn[0].p_status = ENDINGTILE;
 				break;
 			}
 
-			pawn[0].currentTile += roll;
-			pawn[0].currentPosition = board.tile[pawn[0].currentTile];
+			if ((dest >= 2 && dest <= 6) || (dest == 13 || dest == 14) || (dest >= 25 && dest <= 25))
+			{
+				if (pawn[0].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[0].p_currentPositionRect.y -= 10;
+			}
+
+			else if ((dest >= 7 && dest <= 12) || (dest >= 41 && dest <= 45) || (dest == 0 || dest == 1))
+			{
+				if (dest == 7 && pawn[0].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[0].p_currentPositionRect.y -= 10;
+
+				if (pawn[0].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[0].p_currentPositionRect.x -= 10;
+			}
+
+			else if ((dest >= 15 && dest <= 19) || (dest == 26 || dest == 27) || (dest >= 33 && dest <= 38))
+			{
+				if (dest == 33 && pawn[0].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[0].p_currentPositionRect.y += 10;
+
+				if (pawn[0].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[0].p_currentPositionRect.x += 10;
+			}
+
+			else if ((dest >= 20 && dest <= 25))
+			{
+				if (dest == 20 && pawn[0].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[0].p_currentPositionRect.x += 10;
+
+				if (pawn[0].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[0].p_currentPositionRect.y -= 10;
+			}
+
+			else if ((dest >= 28 && dest <= 32) || (dest == 39 || dest == 40) || (dest >= 46 && dest <= 51))
+			{
+				if (dest == 46 && pawn[0].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[0].p_currentPositionRect.x -= 10;
+
+				if (pawn[0].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[0].p_currentPositionRect.y += 10;
+			}
+
+			else if (dest >= board.numTiles)
+				pawn[0].p_currentTileNum = 0;
+
 			break;
+
+		case ENDINGTILE:
+			//if (dest == pawn[0].p_endingTileNum + 1)
+			{
+				pawn[0].p_currentTileNum = 0;
+				pawn[0].p_status = HOME;
+			}
+
+			break;
+
+		case HOME:
+			switch (colour)
+			{
+				case 'b':
+					if (pawn[0].p_currentPositionRect.y != board.blueHome[dest].y)
+						pawn[0].p_currentPositionRect.y -= 10;
+
+					if (pawn[0].p_currentPositionRect.x == board.blueHome[5].x && pawn[0].p_currentPositionRect.y == board.blueHome[5].y)
+						pawn[0].p_status = DONE;
+					break;
+
+				case 'g':
+					if (pawn[0].p_currentPositionRect.y != board.greenHome[dest].y)
+						pawn[0].p_currentPositionRect.y += 10;
+
+					if (pawn[0].p_currentPositionRect.x == board.greenHome[5].x && pawn[0].p_currentPositionRect.y == board.greenHome[5].y)
+						pawn[0].p_status = DONE;
+					break;
+			}
 	}
+
+	
 }
