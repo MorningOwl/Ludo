@@ -7,7 +7,10 @@
 Player::Player(Board &board, char colour) : colour(colour)
 {
 	numPawnsOut = 0;
-	rollDice = false;
+	numPawnsHome = 4;
+	rolled = false;
+	currentPawn = -1;
+	choosing = false;
 
 	switch (colour)
 	{
@@ -38,6 +41,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			{
 				pawn[i].p_startingTileNum = 28;
 				pawn[i].p_endingTileNum = 26;
+				pawn[i].p_currentPositionRect = pawn[i].p_startingPointRect;
 
 				for (int j = 0; j < 5; j++)
 					pawn[i].p_home[j] = board.greenHome[j];
@@ -54,174 +58,123 @@ Player::Player(Board &board, char colour) : colour(colour)
 	}
 }
 
-//void Player::rollDie(Board &board)
-//{
-//	srand(time(0));
-//	roll = 1;// +rand() % 3;
-//
-//	switch (numPawnsOut)
-//	{
-//		case 0:
-//			//if (roll != 6)
-//			//	return;
-//
-//			pawn[0].p_currentTileNum = pawn[0].p_startingTileNum;
-//			pawn[0].p_destination = pawn[0].p_startingTileNum;
-//
-//			pawn[0].p_isOut = true;
-//			numPawnsOut++;
-//			pawn[0].p_currentPositionRect = board.tile[pawn[0].p_currentTileNum];
-//			break;
-//
-//		default:
-//			if (pawn[0].p_currentTileNum + roll >= pawn[0].p_endingTileNum || pawn[0].p_isHome)
-//			{
-//				if (pawn[0].p_isHome)
-//				{
-//					if (pawn[0].p_currentTileNum + roll > 5)
-//						break;
-//
-//					pawn[0].p_currentTileNum += roll;
-//					pawn[0].p_currentPositionRect = pawn[0].p_home[pawn[0].p_currentTileNum];
-//					pawn[0].p_isDone = true;
-//					numPawnsOut--;
-//					break;
-//				}
-//
-//				pawn[0].p_isHome = true;
-//				pawn[0].p_currentTileNum = pawn[0].p_currentTileNum + roll - pawn[0].p_endingTileNum;
-//				pawn[0].p_currentPositionRect = pawn[0].p_home[pawn[0].p_currentTileNum];
-//				break;
-//			}
-//
-//			pawn[0].p_destination = pawn[0].p_currentTileNum + roll;
-//
-//			//pawn[0].p_currentTileNum += roll;
-//			//pawn[0].currentPosition = board.tile[pawn[0].p_currentTileNum];
-//			break;
-//	}
-//}
+void Player::pawnEscape(Board &board)
+{
+	pawn[currentPawn].p_currentPositionRect = board.tile[pawn[currentPawn].p_startingTileNum];
+	pawn[currentPawn].p_currentTileNum = pawn[currentPawn].p_startingTileNum;
+
+	pawn[currentPawn].p_status = OUT;
+	numPawnsOut++;
+	numPawnsHome--;
+}
 
 void Player::rollDie(Board &board)
 {
 	srand(time(0));
 	roll = 1 + rand() % 6;
-	rollDice = true;
+	rolled = true;
 
-	switch (numPawnsOut)
+	switch (pawn[currentPawn].p_status)
 	{
-		case 0:
-			//if (roll != 6)
-			//	return;
-
-			pawn[0].p_currentPositionRect = board.tile[pawn[0].p_startingTileNum];
-			pawn[0].p_currentTileNum = pawn[0].p_startingTileNum;
-
-			pawn[0].p_status = OUT;
-			numPawnsOut++;
+		case START:
+			pawnEscape(board);
 			break;
 
-		case 1:
-			switch (pawn[0].p_status)
-			{
-				case OUT:
-					pawn[0].p_currentTileNum++;
-					break;
+		case OUT:
+			pawn[currentPawn].p_currentTileNum++;
+			break;
 
-				case HOME:
-					pawn[0].p_currentTileNum++;
-					break;
-			}
+		case HOME:
+			if (pawn[currentPawn].p_currentTileNum + roll > 5)
+				break;
 
+			pawn[currentPawn].p_currentTileNum++;
 			break;
 	}
 }
 
 void Player::update(Board &board)
 {
-	int dest = pawn[0].p_currentTileNum;
+	int dest = pawn[currentPawn].p_currentTileNum;
 
-	switch (pawn[0].p_status)
+	switch (pawn[currentPawn].p_status)
 	{
 		case OUT:
-			if (dest == pawn[0].p_endingTileNum + 1)
+			if (dest == pawn[currentPawn].p_endingTileNum + 1)
 			{
-				pawn[0].p_status = ENDINGTILE;
+				pawn[currentPawn].p_status = ENDINGTILE;
 				break;
 			}
 
 			if ((dest >= 2 && dest <= 6) || (dest == 13 || dest == 14) || (dest >= 25 && dest <= 25))
 			{
-				if (pawn[0].p_currentPositionRect.y != board.tile[dest].y)
-					pawn[0].p_currentPositionRect.y -= 10;
+				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[currentPawn].p_currentPositionRect.y -= 10;
 			}
 
 			else if ((dest >= 7 && dest <= 12) || (dest >= 41 && dest <= 45) || (dest == 0 || dest == 1))
 			{
-				if (dest == 7 && pawn[0].p_currentPositionRect.y != board.tile[dest].y)
-					pawn[0].p_currentPositionRect.y -= 10;
+				if (dest == 7 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[currentPawn].p_currentPositionRect.y -= 10;
 
-				if (pawn[0].p_currentPositionRect.x != board.tile[dest].x)
-					pawn[0].p_currentPositionRect.x -= 10;
+				if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[currentPawn].p_currentPositionRect.x -= 10;
 			}
 
 			else if ((dest >= 15 && dest <= 19) || (dest == 26 || dest == 27) || (dest >= 33 && dest <= 38))
 			{
-				if (dest == 33 && pawn[0].p_currentPositionRect.y != board.tile[dest].y)
-					pawn[0].p_currentPositionRect.y += 10;
+				if (dest == 33 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[currentPawn].p_currentPositionRect.y += 10;
 
-				if (pawn[0].p_currentPositionRect.x != board.tile[dest].x)
-					pawn[0].p_currentPositionRect.x += 10;
+				if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[currentPawn].p_currentPositionRect.x += 10;
 			}
 
 			else if ((dest >= 20 && dest <= 25))
 			{
-				if (dest == 20 && pawn[0].p_currentPositionRect.x != board.tile[dest].x)
-					pawn[0].p_currentPositionRect.x += 10;
+				if (dest == 20 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[currentPawn].p_currentPositionRect.x += 10;
 
-				if (pawn[0].p_currentPositionRect.y != board.tile[dest].y)
-					pawn[0].p_currentPositionRect.y -= 10;
+				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[currentPawn].p_currentPositionRect.y -= 10;
 			}
 
 			else if ((dest >= 28 && dest <= 32) || (dest == 39 || dest == 40) || (dest >= 46 && dest <= 51))
 			{
-				if (dest == 46 && pawn[0].p_currentPositionRect.x != board.tile[dest].x)
-					pawn[0].p_currentPositionRect.x -= 10;
+				if (dest == 46 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+					pawn[currentPawn].p_currentPositionRect.x -= 10;
 
-				if (pawn[0].p_currentPositionRect.y != board.tile[dest].y)
-					pawn[0].p_currentPositionRect.y += 10;
+				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+					pawn[currentPawn].p_currentPositionRect.y += 10;
 			}
 
 			else if (dest >= board.numTiles)
-				pawn[0].p_currentTileNum = 0;
+				pawn[currentPawn].p_currentTileNum = 0;
 
 
 			//Moving more than one tile
-			if (pawn[0].p_currentPositionRect.x == board.tile[dest].x && pawn[0].p_currentPositionRect.y == board.tile[dest].y
-				&& rollDice && dest != pawn[0].p_startingTileNum)
+			if (pawn[currentPawn].p_currentPositionRect.x == board.tile[dest].x && pawn[currentPawn].p_currentPositionRect.y == board.tile[dest].y
+				&& rolled && dest != pawn[currentPawn].p_startingTileNum)
 			{
-				pawn[0].p_numTilesMoved++;
-				if (pawn[0].p_numTilesMoved < roll)
+				pawn[currentPawn].p_numTilesMoved++;
+				if (pawn[currentPawn].p_numTilesMoved < roll)
 				{
 					SDL_Delay(50);
-					pawn[0].p_currentTileNum++;
+					pawn[currentPawn].p_currentTileNum++;
 				}
 
 				else
 				{
-					pawn[0].p_numTilesMoved = 0;
-					rollDice = false;
+					pawn[currentPawn].p_numTilesMoved = 0;
+					rolled = false;
 				}
 			}
 
 			break;
 
 		case ENDINGTILE:
-			//if (dest == pawn[0].p_endingTileNum + 1)
-			{
-				pawn[0].p_currentTileNum = 0;
-				pawn[0].p_status = HOME;
-			}
+			pawn[currentPawn].p_currentTileNum = 0;
+			pawn[currentPawn].p_status = HOME;
 
 			break;
 
@@ -229,55 +182,55 @@ void Player::update(Board &board)
 			switch (colour)
 			{
 				case 'b':
-					if (pawn[0].p_currentPositionRect.y != board.blueHome[dest].y)
-						pawn[0].p_currentPositionRect.y -= 10;
+					if (pawn[currentPawn].p_currentPositionRect.y != board.blueHome[dest].y)
+						pawn[currentPawn].p_currentPositionRect.y -= 10;
 
-					if (pawn[0].p_currentPositionRect.x == board.blueHome[5].x && pawn[0].p_currentPositionRect.y == board.blueHome[5].y)
-						pawn[0].p_status = DONE;
+					if (pawn[currentPawn].p_currentPositionRect.x == board.blueHome[5].x && pawn[currentPawn].p_currentPositionRect.y == board.blueHome[5].y)
+						pawn[currentPawn].p_status = DONE;
 
 
 					//Moving more than one tile
-					if (pawn[0].p_currentPositionRect.x == board.blueHome[dest].x && pawn[0].p_currentPositionRect.y == board.blueHome[dest].y
-						&& rollDice && dest != pawn[0].p_startingTileNum)
+					if (pawn[currentPawn].p_currentPositionRect.x == board.blueHome[dest].x && pawn[currentPawn].p_currentPositionRect.y == board.blueHome[dest].y
+						&& rolled && dest != pawn[currentPawn].p_startingTileNum)
 					{
-						pawn[0].p_numTilesMoved++;
-						if (pawn[0].p_numTilesMoved < roll)
+						pawn[currentPawn].p_numTilesMoved++;
+						if (pawn[currentPawn].p_numTilesMoved < roll)
 						{
 							SDL_Delay(50);
-							pawn[0].p_currentTileNum++;
+							pawn[currentPawn].p_currentTileNum++;
 						}
 
 						else
 						{
-							pawn[0].p_numTilesMoved = 0;
-							rollDice = false;
+							pawn[currentPawn].p_numTilesMoved = 0;
+							rolled = false;
 						}
 					}
 					break;
 
 				case 'g':
-					if (pawn[0].p_currentPositionRect.y != board.greenHome[dest].y)
-						pawn[0].p_currentPositionRect.y += 10;
+					if (pawn[currentPawn].p_currentPositionRect.y != board.greenHome[dest].y)
+						pawn[currentPawn].p_currentPositionRect.y += 10;
 
-					if (pawn[0].p_currentPositionRect.x == board.greenHome[5].x && pawn[0].p_currentPositionRect.y == board.greenHome[5].y)
-						pawn[0].p_status = DONE;
+					if (pawn[currentPawn].p_currentPositionRect.x == board.greenHome[5].x && pawn[currentPawn].p_currentPositionRect.y == board.greenHome[5].y)
+						pawn[currentPawn].p_status = DONE;
 
 
 					//Moving more than one tile
-					if (pawn[0].p_currentPositionRect.x == board.greenHome[dest].x && pawn[0].p_currentPositionRect.y == board.greenHome[dest].y
-						&& rollDice && dest != pawn[0].p_startingTileNum)
+					if (pawn[currentPawn].p_currentPositionRect.x == board.greenHome[dest].x && pawn[currentPawn].p_currentPositionRect.y == board.greenHome[dest].y
+						&& rolled && dest != pawn[currentPawn].p_startingTileNum)
 					{
-						pawn[0].p_numTilesMoved++;
-						if (pawn[0].p_numTilesMoved < roll)
+						pawn[currentPawn].p_numTilesMoved++;
+						if (pawn[currentPawn].p_numTilesMoved < roll)
 						{
 							SDL_Delay(50);
-							pawn[0].p_currentTileNum++;
+							pawn[currentPawn].p_currentTileNum++;
 						}
 
 						else
 						{
-							pawn[0].p_numTilesMoved = 0;
-							rollDice = false;
+							pawn[currentPawn].p_numTilesMoved = 0;
+							rolled = false;
 						}
 					}
 					break;

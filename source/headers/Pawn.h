@@ -1,7 +1,7 @@
 #pragma once
 #include "Texture.h"
 
-enum Status { START, INIT, OUT, ENDINGTILE, HOME, DONE };
+enum Status { START, OUT, ENDINGTILE, HOME, DONE };
 
 class Pawn
 {
