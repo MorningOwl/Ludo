@@ -6,6 +6,9 @@
 #define fps 60
 
 
+enum Turn { PLAYER1, PLAYER2 };
+Turn turn = PLAYER1;
+
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
 
@@ -32,14 +35,12 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	SDL_Event ev;
-	bool running = true;
+	SDL_Event ev;						//polled event
+	int starting_time, ending_time;		//frame time
+	int x, y;							//mouse states
 
-	int starting_time, ending_time;
-
-	int x, y;
-
-	while (running)
+	//Main loop
+	while (true)
 	{
 		starting_time = SDL_GetTicks();
 
@@ -48,40 +49,47 @@ int main(int argc, char *argv[])
 			switch (ev.type)
 			{
 				case SDL_QUIT:
-					running = false;
-					break;
+					close();
+					return 0;
 
 				case SDL_KEYDOWN:
 					switch (ev.key.keysym.sym)
 					{
 						case SDLK_ESCAPE:
-							running = false;
-							break;
+							close();
+							return 0;
 
 						case SDLK_z:
-							if (p1.numPawnsOut == 0 || p1.numPawnsOut > 1 || (p1.roll == 6 && p1.numPawnsHome > 0))
+							if (turn == PLAYER1)
 							{
-								p1.choosing = true;
-								break;
+								if (p1.numPawnsOut == 0 || p1.numPawnsOut > 1 || (p1.roll == 6 && p1.numPawnsHome > 0))
+								{
+									p1.choosing = true;
+									break;
+								}
+
+								p1.rollDie(board);
 							}
-							
-							p1.rollDie(board);
 							break;
 
 						case SDLK_x:
-							if (p2.numPawnsOut == 0 || p2.numPawnsOut > 1 || (p2.roll == 6 && p2.numPawnsHome > 0))
+							if (turn == PLAYER2)
 							{
-								p2.choosing = true;
-								break;
-							}
+								if (p2.numPawnsOut == 0 || p2.numPawnsOut > 1 || (p2.roll == 6 && p2.numPawnsHome > 0))
+								{
+									p2.choosing = true;
+									break;
+								}
 
-							p2.rollDie(board);
+								p2.rollDie(board);
+							}
 							break;
 					}
+
 					break;
 
 				case SDL_MOUSEBUTTONDOWN:
-					if (p1.choosing)
+					if (turn == PLAYER1 && p1.choosing)
 					{
 						SDL_GetMouseState(&x, &y);
 						for (int i = 0; i < 4; i++)
@@ -89,7 +97,9 @@ int main(int argc, char *argv[])
 							if (x >= p1.pawn[i].p_currentPositionRect.x && x <= p1.pawn[i].p_currentPositionRect.x + p1.pawn[i].p_currentPositionRect.w
 								&& y >= p1.pawn[i].p_currentPositionRect.y && y <= p1.pawn[i].p_currentPositionRect.y + p1.pawn[i].p_currentPositionRect.h)
 							{
-								p1.currentPawn = i;
+								if (p1.pawn[i].p_status != DONE)
+									p1.currentPawn = i;
+
 								p1.choosing = false;
 								break;
 							}
@@ -99,7 +109,7 @@ int main(int argc, char *argv[])
 							p1.rollDie(board);
 					}
 
-					else if (p2.choosing)
+					else if (turn == PLAYER2 && p2.choosing)
 					{
 						SDL_GetMouseState(&x, &y);
 						for (int i = 0; i < 4; i++)
@@ -107,7 +117,9 @@ int main(int argc, char *argv[])
 							if (x >= p2.pawn[i].p_currentPositionRect.x && x <= p2.pawn[i].p_currentPositionRect.x + p2.pawn[i].p_currentPositionRect.w
 								&& y >= p2.pawn[i].p_currentPositionRect.y && y <= p2.pawn[i].p_currentPositionRect.y + p2.pawn[i].p_currentPositionRect.h)
 							{
-								p2.currentPawn = i;
+								if (p2.pawn[i].p_status != DONE)
+									p2.currentPawn = i;
+
 								p2.choosing = false;
 								break;
 							}
@@ -121,6 +133,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		//Draw game board
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(renderer);
 
@@ -128,8 +141,40 @@ int main(int argc, char *argv[])
 		p2.update(board);
 		drawBoard();
 
+		//Highlight pawns
+		if (p1.choosing)
+		{
+			SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0xFF, 0xFF);
+			for (int i = 0; i < 4; i++)
+				if (p1.pawn[i].p_status != DONE)
+					SDL_RenderDrawRect(renderer, &p1.pawn[i].p_currentPositionRect);
+		}
+
+		else if (p2.choosing)
+		{
+			SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0, 0);
+			for (int i = 0; i < 4; i++)
+				if (p2.pawn[i].p_status != DONE)
+					SDL_RenderDrawRect(renderer, &p2.pawn[i].p_currentPositionRect);
+		}
+
+		//Change turns
+		switch (turn)
+		{
+			case PLAYER1:
+				if (p1.isDone)
+					p1.isDone = false, turn = PLAYER2;
+				break;
+
+			case PLAYER2:
+				if (p2.isDone)
+					p2.isDone = false, turn = PLAYER1;
+				break;
+		}
+
 		SDL_RenderPresent(renderer);
 
+		//Cap frame rate
 		ending_time = SDL_GetTicks();
 		if (ending_time - starting_time < 1000 / fps)
 			SDL_Delay(1000 / fps - (ending_time - starting_time));
@@ -142,7 +187,6 @@ int main(int argc, char *argv[])
 
 void initBoard()
 {
-	//Pawns
 	for (int i = 0; i < 4; i++)
 	{
 		switch (p1.colour)
@@ -229,11 +273,11 @@ void drawBoard()
 {
 	board.draw(renderer);
 
-	//Draw Text
+	//Text
 	p1Text.draw(renderer, 75, 565);
 	p2Text.draw(renderer, 435, 15);
 
-	//Draw Pawns
+	//Pawns
 	for (int i = 0; i < 4; i++)
 	{
 		pawnSheet.draw(renderer, p1.pawn[i].p_currentPositionRect.x, p1.pawn[i].p_currentPositionRect.y, &p1.pawn[i].p_body);

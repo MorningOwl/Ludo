@@ -11,6 +11,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 	rolled = false;
 	currentPawn = -1;
 	choosing = false;
+	isDone = false;
 
 	switch (colour)
 	{
@@ -86,7 +87,26 @@ void Player::rollDie(Board &board)
 
 		case HOME:
 			if (pawn[currentPawn].p_currentTileNum + roll > 5)
-				break;
+			{
+				switch (numPawnsOut)
+				{
+					case 0:
+						rolled = false;
+						isDone = true;
+						return;
+
+					case 1:
+						for (int i = 0; i < 4; i++)
+							if (pawn[i].p_status == OUT)
+								currentPawn = i;
+						break;
+
+					default:
+						choosing = true;
+						rolled = false;
+						return;
+				}
+			}
 
 			pawn[currentPawn].p_currentTileNum++;
 			break;
@@ -167,6 +187,7 @@ void Player::update(Board &board)
 				{
 					pawn[currentPawn].p_numTilesMoved = 0;
 					rolled = false;
+					isDone = true;
 				}
 			}
 
@@ -175,7 +196,6 @@ void Player::update(Board &board)
 		case ENDINGTILE:
 			pawn[currentPawn].p_currentTileNum = 0;
 			pawn[currentPawn].p_status = HOME;
-
 			break;
 
 		case HOME:
@@ -186,7 +206,15 @@ void Player::update(Board &board)
 						pawn[currentPawn].p_currentPositionRect.y -= 10;
 
 					if (pawn[currentPawn].p_currentPositionRect.x == board.blueHome[5].x && pawn[currentPawn].p_currentPositionRect.y == board.blueHome[5].y)
+					{
+						numPawnsOut--;
 						pawn[currentPawn].p_status = DONE;
+
+						if (numPawnsOut == 1)
+							for (int i = 0; i < 4; i++)
+								if (pawn[i].p_status == OUT)
+									currentPawn = i;
+					}
 
 
 					//Moving more than one tile
@@ -204,6 +232,7 @@ void Player::update(Board &board)
 						{
 							pawn[currentPawn].p_numTilesMoved = 0;
 							rolled = false;
+							isDone = true;
 						}
 					}
 					break;
@@ -213,7 +242,15 @@ void Player::update(Board &board)
 						pawn[currentPawn].p_currentPositionRect.y += 10;
 
 					if (pawn[currentPawn].p_currentPositionRect.x == board.greenHome[5].x && pawn[currentPawn].p_currentPositionRect.y == board.greenHome[5].y)
+					{
+						numPawnsOut--;
 						pawn[currentPawn].p_status = DONE;
+
+						if (numPawnsOut == 1)
+							for (int i = 0; i < 4; i++)
+								if (pawn[i].p_status == OUT)
+									currentPawn = i;
+					}
 
 
 					//Moving more than one tile
@@ -231,6 +268,7 @@ void Player::update(Board &board)
 						{
 							pawn[currentPawn].p_numTilesMoved = 0;
 							rolled = false;
+							isDone = true;
 						}
 					}
 					break;

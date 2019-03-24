@@ -21,4 +21,5 @@ class Player
 		bool rolled;
 		int currentPawn;
 		bool choosing;
+		bool isDone;
 };
