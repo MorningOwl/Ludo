@@ -19,4 +19,5 @@ class Pawn
 
 		int p_currentTileNum;
 		int p_startingTileNum, p_endingTileNum;
+		bool wasCaptured;
 };

@@ -84,6 +84,11 @@ int main(int argc, char *argv[])
 								p2.rollDie(board);
 							}
 							break;
+
+						case SDLK_c:
+							for (int i = 0; i < 4; i++)
+								if (p2.pawn[i].p_status == OUT || p1.pawn[i].p_status == OUT)
+									p2.pawn[i].wasCaptured = true, p1.pawn[i].wasCaptured = true;
 					}
 
 					break;
@@ -163,12 +168,28 @@ int main(int argc, char *argv[])
 		{
 			case PLAYER1:
 				if (p1.isDone)
-					p1.isDone = false, turn = PLAYER2;
+				{
+					for (int i = 0; i < 4; i++)
+						if (p1.pawn[p1.currentPawn].p_currentTileNum == p2.pawn[i].p_currentTileNum)
+							p2.pawn[i].wasCaptured = true;
+
+					p1.isDone = false;
+					turn = PLAYER2;
+				}
+
 				break;
 
 			case PLAYER2:
 				if (p2.isDone)
-					p2.isDone = false, turn = PLAYER1;
+				{
+					for (int i = 0; i < 4; i++)
+						if (p2.pawn[p2.currentPawn].p_currentTileNum == p1.pawn[i].p_currentTileNum)
+							p1.pawn[i].wasCaptured = true;
+
+					p2.isDone = false;
+					turn = PLAYER1;
+				}
+
 				break;
 		}
 

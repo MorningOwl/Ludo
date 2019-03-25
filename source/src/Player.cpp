@@ -56,6 +56,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 		pawn[i].p_status = START;
 		pawn[i].p_endingTileRect = board.tile[pawn[i].p_endingTileNum];
 		pawn[i].p_numTilesMoved = 0;
+		pawn[i].wasCaptured = false;
 	}
 }
 
@@ -120,6 +121,66 @@ void Player::update(Board &board)
 	switch (pawn[currentPawn].p_status)
 	{
 		case OUT:
+			for (int i = 0; i < 4; i++)
+				if (pawn[i].wasCaptured)
+				{
+					/*if (!(pawn[i].p_currentPositionRect.x == board.tile[pawn[i].p_startingTileNum].x &&
+						pawn[i].p_currentPositionRect.y == board.tile[pawn[i].p_startingTileNum].y))
+					{
+						pawn[i].p_currentTileNum--;
+						dest = pawn[i].p_currentTileNum;
+
+						if ((dest >= 1 && dest <= 6) || (dest == 12 || dest == 13) || (dest >= 20 && dest <= 25))
+						{
+							if (dest == 6 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+								pawn[currentPawn].p_currentPositionRect.x += 10;
+
+							if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+								pawn[currentPawn].p_currentPositionRect.y += 10;
+						}
+
+						else if ((dest >= 7 && dest <= 11) || (dest >= 40 && dest <= 45) || (dest == 51 || dest == 1))
+						{
+							if (dest == 45 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+								pawn[currentPawn].p_currentPositionRect.y -= 10;
+
+							if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+								pawn[currentPawn].p_currentPositionRect.x += 10;
+						}
+
+						else if ((dest >= 14 && dest <= 19) || (dest == 26 || dest == 25) || (dest >= 32 && dest <= 37))
+						{
+							if (dest == 32 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].x)
+								pawn[currentPawn].p_currentPositionRect.y -= 10;
+
+							if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+								pawn[currentPawn].p_currentPositionRect.x -= 10;
+						}
+
+						else if ((dest >= 27 && dest <= 32) || (dest == 39 || dest == 38) || (dest >= 46 && dest <= 50))
+						{
+							if (dest == 32 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+								pawn[currentPawn].p_currentPositionRect.x -= 10;
+
+							if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+								pawn[currentPawn].p_currentPositionRect.y -= 10;
+						}
+
+						SDL_Delay(10);
+					}
+
+					else
+					{*/
+						pawn[i].p_currentPositionRect = pawn[i].p_startingPointRect;
+						pawn[i].p_currentTileNum = -1;
+						pawn[i].wasCaptured = false;
+						pawn[i].p_status = START;
+						numPawnsOut--;
+						numPawnsHome++;
+						return;
+					//}
+				}
+
 			if (dest == pawn[currentPawn].p_endingTileNum + 1)
 			{
 				pawn[currentPawn].p_status = ENDINGTILE;
@@ -196,6 +257,7 @@ void Player::update(Board &board)
 		case ENDINGTILE:
 			pawn[currentPawn].p_currentTileNum = 0;
 			pawn[currentPawn].p_status = HOME;
+			isDone = true;
 			break;
 
 		case HOME:
