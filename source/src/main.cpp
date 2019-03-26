@@ -213,25 +213,37 @@ void initBoard()
 		switch (p1.colour)
 		{
 			case 'b':
-				p1.pawn[i].p_body = { 0, 0, 40, 40 };
+				p1.pawn[i].p_form[0] = { 0, 0, 40, 40 };
+				p1.pawn[i].p_form[1] = { 0, 40, 40, 40 };
+				p1.pawn[i].p_form[2] = { 0, 80, 40, 40 };
+				p1.pawn[i].p_form[3] = { 0, 120, 40, 40 };
 				p1.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 				break;
 
 			case 'g':
-				p1.pawn[i].p_body = { 80, 0, 40, 40 };
-				p1.pawn[i].p_currentPositionRect = board.greenStartSquares[i];
+				p1.pawn[i].p_form[0] = { 80, 0, 40, 40 };
+				p1.pawn[i].p_form[1] = { 80, 40, 40, 40 };
+				p1.pawn[i].p_form[2] = { 80, 80, 40, 40 };
+				p1.pawn[i].p_form[3] = { 80, 120, 40, 40 };
+				p1.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 				break;
 		}
 		
 		switch (p2.colour)
 		{
 			case 'b':
-				p2.pawn[i].p_body = { 0, 0, 40, 40 };
+				p2.pawn[i].p_form[0] = { 0, 0, 40, 40 };
+				p2.pawn[i].p_form[1] = { 0, 40, 40, 40 };
+				p2.pawn[i].p_form[2] = { 0, 80, 40, 40 };
+				p2.pawn[i].p_form[3] = { 0, 120, 40, 40 };
 				p2.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 				break;
 
 			case 'g':
-				p2.pawn[i].p_body = { 80, 0, 40, 40 };
+				p2.pawn[i].p_form[0] = { 80, 0, 40, 40 };
+				p2.pawn[i].p_form[1] = { 80, 40, 40, 40 };
+				p2.pawn[i].p_form[2] = { 80, 80, 40, 40 };
+				p2.pawn[i].p_form[3] = { 80, 120, 40, 40 };
 				p2.pawn[i].p_currentPositionRect= board.greenStartSquares[i];
 				break;
 		}
@@ -301,7 +313,7 @@ void drawBoard()
 	//Pawns
 	for (int i = 0; i < 4; i++)
 	{
-		pawnSheet.draw(renderer, p1.pawn[i].p_currentPositionRect.x, p1.pawn[i].p_currentPositionRect.y, &p1.pawn[i].p_body);
-		pawnSheet.draw(renderer, p2.pawn[i].p_currentPositionRect.x, p2.pawn[i].p_currentPositionRect.y, &p2.pawn[i].p_body);
+		pawnSheet.draw(renderer, p1.pawn[i].p_currentPositionRect.x, p1.pawn[i].p_currentPositionRect.y, &p1.pawn[i].p_form[p1.pawn[i].currentForm]);
+		pawnSheet.draw(renderer, p2.pawn[i].p_currentPositionRect.x, p2.pawn[i].p_currentPositionRect.y, &p2.pawn[i].p_form[p2.pawn[i].currentForm]);
 	}
 }

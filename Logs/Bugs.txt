@@ -1,0 +1,9 @@
+BUGS
+
+
+1.Dice roll number changes after choosing pawn.
+2.Finishing pawn captures opposing finished pawn.
+3.Multiple pawns don't display when on the same tile.
+4.Captured pawn is still currentPawn and escapes on rolling die.
+5.Highlighting pawns when choosing.
+6.Displaying correct sprites for pawns.

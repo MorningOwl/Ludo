@@ -42,4 +42,19 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Logs\Bugs.txt" />
+    <Text Include="Logs\To do.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\Finish.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\Pawns.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Fonts\Antaro.ttf" />
+  </ItemGroup>
 </Project>

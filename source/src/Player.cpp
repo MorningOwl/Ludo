@@ -55,8 +55,10 @@ Player::Player(Board &board, char colour) : colour(colour)
 	{
 		pawn[i].p_status = START;
 		pawn[i].p_endingTileRect = board.tile[pawn[i].p_endingTileNum];
+		pawn[i].p_currentTileNum = -1;
 		pawn[i].p_numTilesMoved = 0;
 		pawn[i].wasCaptured = false;
+		pawn[i].currentForm = 0;
 	}
 }
 
@@ -231,6 +233,17 @@ void Player::update(Board &board)
 
 			else if (dest >= board.numTiles)
 				pawn[currentPawn].p_currentTileNum = 0;
+
+
+			//Render more than one pawn in a space
+			pawn[currentPawn].p_numPawnsInSpace = 0;
+			for (int i = 0; i < 4; i++)
+			{
+				if (pawn[currentPawn].p_currentTileNum == pawn[i].p_currentTileNum && currentPawn != i)
+					pawn[currentPawn].p_numPawnsInSpace++, pawn[i].p_numPawnsInSpace++;
+
+				pawn[i].currentForm = pawn[i].p_numPawnsInSpace;
+			}
 
 
 			//Moving more than one tile
