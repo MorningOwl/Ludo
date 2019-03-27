@@ -1,7 +1,7 @@
-TO DO LIST
+TO DO
 
 
-1.Finish main game mechanics.
-2.Add visual dice.
+1.Add visual dice.
+2.Fix update times*
 3.Add 6-roll perks.
-4.Fix update times.
+4.Finish main game mechanics.

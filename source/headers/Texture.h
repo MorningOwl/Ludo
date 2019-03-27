@@ -13,6 +13,7 @@ class Texture
 
 		void free();
 		bool loadTexture(SDL_Renderer *renderer, std::string path);
+		void setColour(Uint8 red, Uint8 green, Uint8 blue);
 		bool loadRendertext(SDL_Renderer *renderer, TTF_Font *font, std::string text, SDL_Color colour);
 		void draw(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip = NULL);
 

@@ -7,7 +7,7 @@ class Player
 {
 	public:
 		Player(Board &board, char colour);
-		void rollDie(Board &board);
+		void rollDie(Board &board, int roll = NULL);
 		void pawnEscape(Board &board);
 		void update(Board &board);
 
@@ -15,11 +15,11 @@ class Player
 		int numPawnsOut;
 		int numPawnsHome;
 
-		int roll;
+		int roll, tempRoll;
 		char colour;
 
 		bool rolled;
 		int currentPawn;
 		bool choosing;
-		bool isDone;
+		bool isDoneMoving;
 };

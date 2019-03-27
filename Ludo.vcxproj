@@ -158,6 +158,7 @@
     <ClInclude Include="source\headers\Pawn.h" />
     <ClInclude Include="source\headers\Player.h" />
     <ClInclude Include="source\headers\Texture.h" />
+    <ClInclude Include="source\headers\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\src\Board.cpp" />

@@ -19,6 +19,7 @@ Board board;
 Player p1(board, 'b'), p2(board, 'g');
 
 Texture pawnSheet;
+Texture dice[2];
 
 void drawBoard();
 
@@ -64,6 +65,7 @@ int main(int argc, char *argv[])
 							{
 								if (p1.numPawnsOut == 0 || p1.numPawnsOut > 1 || (p1.roll == 6 && p1.numPawnsHome > 0))
 								{
+									p1.tempRoll = p1.roll;
 									p1.choosing = true;
 									break;
 								}
@@ -77,6 +79,7 @@ int main(int argc, char *argv[])
 							{
 								if (p2.numPawnsOut == 0 || p2.numPawnsOut > 1 || (p2.roll == 6 && p2.numPawnsHome > 0))
 								{
+									p2.tempRoll = p2.roll;
 									p2.choosing = true;
 									break;
 								}
@@ -102,7 +105,7 @@ int main(int argc, char *argv[])
 							if (x >= p1.pawn[i].p_currentPositionRect.x && x <= p1.pawn[i].p_currentPositionRect.x + p1.pawn[i].p_currentPositionRect.w
 								&& y >= p1.pawn[i].p_currentPositionRect.y && y <= p1.pawn[i].p_currentPositionRect.y + p1.pawn[i].p_currentPositionRect.h)
 							{
-								if (p1.pawn[i].p_status != DONE)
+								if (p1.pawn[i].canMove)
 									p1.currentPawn = i;
 
 								p1.choosing = false;
@@ -111,7 +114,7 @@ int main(int argc, char *argv[])
 						}
 
 						if (p1.currentPawn > -1)
-							p1.rollDie(board);
+							p1.rollDie(board, p1.tempRoll);
 					}
 
 					else if (turn == PLAYER2 && p2.choosing)
@@ -122,7 +125,7 @@ int main(int argc, char *argv[])
 							if (x >= p2.pawn[i].p_currentPositionRect.x && x <= p2.pawn[i].p_currentPositionRect.x + p2.pawn[i].p_currentPositionRect.w
 								&& y >= p2.pawn[i].p_currentPositionRect.y && y <= p2.pawn[i].p_currentPositionRect.y + p2.pawn[i].p_currentPositionRect.h)
 							{
-								if (p2.pawn[i].p_status != DONE)
+								if (p2.pawn[i].canMove)
 									p2.currentPawn = i;
 
 								p2.choosing = false;
@@ -131,7 +134,7 @@ int main(int argc, char *argv[])
 						}
 
 						if (p2.currentPawn > -1)
-							p2.rollDie(board);
+							p2.rollDie(board, p2.tempRoll);
 					}
 
 					break;
@@ -151,7 +154,7 @@ int main(int argc, char *argv[])
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0xFF, 0xFF);
 			for (int i = 0; i < 4; i++)
-				if (p1.pawn[i].p_status != DONE)
+				if (p1.pawn[i].canMove)
 					SDL_RenderDrawRect(renderer, &p1.pawn[i].p_currentPositionRect);
 		}
 
@@ -159,7 +162,7 @@ int main(int argc, char *argv[])
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0, 0);
 			for (int i = 0; i < 4; i++)
-				if (p2.pawn[i].p_status != DONE)
+				if (p2.pawn[i].canMove)
 					SDL_RenderDrawRect(renderer, &p2.pawn[i].p_currentPositionRect);
 		}
 
@@ -167,26 +170,30 @@ int main(int argc, char *argv[])
 		switch (turn)
 		{
 			case PLAYER1:
-				if (p1.isDone)
+				dice[PLAYER1].setColour(255, 255, 255);
+				dice[PLAYER2].setColour(150, 150, 150);
+				if (p1.isDoneMoving)
 				{
 					for (int i = 0; i < 4; i++)
-						if (p1.pawn[p1.currentPawn].p_currentTileNum == p2.pawn[i].p_currentTileNum)
+						if (p1.pawn[p1.currentPawn].p_currentTileNum == p2.pawn[i].p_currentTileNum && p2.pawn[i].p_status == OUT)
 							p2.pawn[i].wasCaptured = true;
 
-					p1.isDone = false;
+					p1.isDoneMoving = false;
 					turn = PLAYER2;
 				}
 
 				break;
 
 			case PLAYER2:
-				if (p2.isDone)
+				dice[PLAYER2].setColour(255, 255, 255);
+				dice[PLAYER1].setColour(150, 150, 150);
+				if (p2.isDoneMoving)
 				{
 					for (int i = 0; i < 4; i++)
-						if (p2.pawn[p2.currentPawn].p_currentTileNum == p1.pawn[i].p_currentTileNum)
+						if (p2.pawn[p2.currentPawn].p_currentTileNum == p1.pawn[i].p_currentTileNum && p1.pawn[i].p_status == OUT)
 							p1.pawn[i].wasCaptured = true;
 
-					p2.isDone = false;
+					p2.isDoneMoving = false;
 					turn = PLAYER1;
 				}
 
@@ -275,6 +282,8 @@ bool loadMedia()
 {
 	if (!board.finish.loadTexture(renderer, "Images/Finish.png")) return false;
 	if (!pawnSheet.loadTexture(renderer, "Images/Pawns.png")) return false;
+	if (!dice[0].loadTexture(renderer, "Images/Dice.png")) return false;
+	if (!dice[1].loadTexture(renderer, "Images/Dice.png")) return false;
 
 	font = TTF_OpenFont("Fonts/Antaro.ttf", 28);
 	if (font == NULL) return false;
@@ -313,7 +322,10 @@ void drawBoard()
 	//Pawns
 	for (int i = 0; i < 4; i++)
 	{
-		pawnSheet.draw(renderer, p1.pawn[i].p_currentPositionRect.x, p1.pawn[i].p_currentPositionRect.y, &p1.pawn[i].p_form[p1.pawn[i].currentForm]);
-		pawnSheet.draw(renderer, p2.pawn[i].p_currentPositionRect.x, p2.pawn[i].p_currentPositionRect.y, &p2.pawn[i].p_form[p2.pawn[i].currentForm]);
+		pawnSheet.draw(renderer, p1.pawn[i].p_currentPositionRect.x, p1.pawn[i].p_currentPositionRect.y, &p1.pawn[i].p_form[p1.pawn[i].p_currentForm]);
+		pawnSheet.draw(renderer, p2.pawn[i].p_currentPositionRect.x, p2.pawn[i].p_currentPositionRect.y, &p2.pawn[i].p_form[p2.pawn[i].p_currentForm]);
 	}
+
+	dice[PLAYER1].draw(renderer, 197, 557, &board.dice[p1.roll]);
+	dice[PLAYER2].draw(renderer, 368, 8, &board.dice[p2.roll]);
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include "Texture.h"
+#include "Tile.h"
 
 
 class Board
@@ -9,9 +10,11 @@ class Board
 		Board();
 		void draw(SDL_Renderer *renderer);
 
-		SDL_Rect tile[52];
+		Tile tile[52];
 		int numTiles = 52;
 		Texture finish;
+
+		SDL_Rect dice[7];
 
 		SDL_Rect redStartSquares[4];
 		SDL_Rect greenStartSquares[4];

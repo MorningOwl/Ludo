@@ -7,9 +7,10 @@ class Pawn
 {
 	public:
 		Texture p_texture;
+		int p_colourNum;
 
 		SDL_Rect p_form[4];
-		int currentForm;
+		int p_currentForm;
 
 		SDL_Rect p_home[6];
 		Status p_status;
@@ -23,5 +24,7 @@ class Pawn
 
 		int p_currentTileNum;
 		int p_startingTileNum, p_endingTileNum;
+
 		bool wasCaptured;
+		bool canMove;
 };

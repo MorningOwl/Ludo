@@ -37,6 +37,11 @@ bool Texture::loadTexture(SDL_Renderer *renderer, std::string path)
 	return t_texture != NULL;
 }
 
+void Texture::setColour(Uint8 red, Uint8 green, Uint8 blue)
+{
+	SDL_SetTextureColorMod(t_texture, red, green, blue);
+}
+
 bool Texture::loadRendertext(SDL_Renderer *renderer, TTF_Font *font, std::string text, SDL_Color colour)
 {
 	SDL_Surface *textSurface = TTF_RenderText_Solid(font, text.c_str(), colour);

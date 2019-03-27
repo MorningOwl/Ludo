@@ -11,7 +11,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 	rolled = false;
 	currentPawn = -1;
 	choosing = false;
-	isDone = false;
+	isDoneMoving = false;
 
 	switch (colour)
 	{
@@ -25,6 +25,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			{
 				pawn[i].p_startingTileNum = 2;
 				pawn[i].p_endingTileNum = 0;
+				pawn[i].p_colourNum = 0;
 
 				for (int j = 0; j < 6; j++)
 					pawn[i].p_home[j] = board.blueHome[j];
@@ -42,7 +43,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			{
 				pawn[i].p_startingTileNum = 28;
 				pawn[i].p_endingTileNum = 26;
-				pawn[i].p_currentPositionRect = pawn[i].p_startingPointRect;
+				pawn[i].p_colourNum = 1;
 
 				for (int j = 0; j < 5; j++)
 					pawn[i].p_home[j] = board.greenHome[j];
@@ -54,17 +55,19 @@ Player::Player(Board &board, char colour) : colour(colour)
 	for (int i = 0; i < 4; i++)
 	{
 		pawn[i].p_status = START;
-		pawn[i].p_endingTileRect = board.tile[pawn[i].p_endingTileNum];
+		pawn[i].p_currentPositionRect = pawn[i].p_startingPointRect;
+		pawn[i].p_endingTileRect = board.tile[pawn[i].p_endingTileNum].rect;
 		pawn[i].p_currentTileNum = -1;
 		pawn[i].p_numTilesMoved = 0;
 		pawn[i].wasCaptured = false;
-		pawn[i].currentForm = 0;
+		pawn[i].canMove = true;
+		pawn[i].p_currentForm = 0;
 	}
 }
 
 void Player::pawnEscape(Board &board)
 {
-	pawn[currentPawn].p_currentPositionRect = board.tile[pawn[currentPawn].p_startingTileNum];
+	pawn[currentPawn].p_currentPositionRect = board.tile[pawn[currentPawn].p_startingTileNum].rect;
 	pawn[currentPawn].p_currentTileNum = pawn[currentPawn].p_startingTileNum;
 
 	pawn[currentPawn].p_status = OUT;
@@ -72,11 +75,15 @@ void Player::pawnEscape(Board &board)
 	numPawnsHome--;
 }
 
-void Player::rollDie(Board &board)
+void Player::rollDie(Board &board, int roll)
 {
 	srand(time(0));
-	roll = 1 + rand() % 6;
+	this->roll = (roll == NULL) ? 1 + rand() % 6 : roll;
 	rolled = true;
+
+	for (int i = 0; i < 4; i++)
+		if (pawn[i].p_status != DONE)
+			pawn[i].canMove = true;
 
 	switch (pawn[currentPawn].p_status)
 	{
@@ -95,7 +102,8 @@ void Player::rollDie(Board &board)
 				{
 					case 0:
 						rolled = false;
-						isDone = true;
+						isDoneMoving = true;
+						pawn[currentPawn].canMove = false;
 						return;
 
 					case 1:
@@ -109,6 +117,8 @@ void Player::rollDie(Board &board)
 						rolled = false;
 						return;
 				}
+
+				pawn[currentPawn].canMove = false;
 			}
 
 			pawn[currentPawn].p_currentTileNum++;
@@ -191,63 +201,79 @@ void Player::update(Board &board)
 
 			if ((dest >= 2 && dest <= 6) || (dest == 13 || dest == 14) || (dest >= 25 && dest <= 25))
 			{
-				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].rect.y)
 					pawn[currentPawn].p_currentPositionRect.y -= 10;
 			}
 
 			else if ((dest >= 7 && dest <= 12) || (dest >= 41 && dest <= 45) || (dest == 0 || dest == 1))
 			{
-				if (dest == 7 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+				if (dest == 7 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].rect.y)
 					pawn[currentPawn].p_currentPositionRect.y -= 10;
 
-				if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+				if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].rect.x)
 					pawn[currentPawn].p_currentPositionRect.x -= 10;
 			}
 
 			else if ((dest >= 15 && dest <= 19) || (dest == 26 || dest == 27) || (dest >= 33 && dest <= 38))
 			{
-				if (dest == 33 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+				if (dest == 33 && pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].rect.y)
 					pawn[currentPawn].p_currentPositionRect.y += 10;
 
-				if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+				if (pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].rect.x)
 					pawn[currentPawn].p_currentPositionRect.x += 10;
 			}
 
 			else if ((dest >= 20 && dest <= 25))
 			{
-				if (dest == 20 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+				if (dest == 20 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].rect.x)
 					pawn[currentPawn].p_currentPositionRect.x += 10;
 
-				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].rect.y)
 					pawn[currentPawn].p_currentPositionRect.y -= 10;
 			}
 
 			else if ((dest >= 28 && dest <= 32) || (dest == 39 || dest == 40) || (dest >= 46 && dest <= 51))
 			{
-				if (dest == 46 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].x)
+				if (dest == 46 && pawn[currentPawn].p_currentPositionRect.x != board.tile[dest].rect.x)
 					pawn[currentPawn].p_currentPositionRect.x -= 10;
 
-				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].y)
+				if (pawn[currentPawn].p_currentPositionRect.y != board.tile[dest].rect.y)
 					pawn[currentPawn].p_currentPositionRect.y += 10;
 			}
 
+			//Reset tile number of pawn if it crosses the last tile
 			else if (dest >= board.numTiles)
 				pawn[currentPawn].p_currentTileNum = 0;
 
-
 			//Render more than one pawn in a space
-			pawn[currentPawn].p_numPawnsInSpace = 0;
+			for (int i = 0; i < 52; i++)
+				for (int j = 0; j < 4; j++)
+					board.tile[i].numPawns[j] = 0;
+
+			for (int i = 0; i < 4 && pawn[i].p_status == OUT; i++)
+			{
+				for (int j = 0; j < 52; j++)
+				{
+					if (pawn[i].p_currentTileNum == board.tile[j].index)
+						board.tile[j].numPawns[pawn[i].p_colourNum]++;
+				}
+
+				pawn[i].p_currentForm = board.tile[pawn[i].p_currentTileNum].numPawns[pawn[i].p_colourNum];
+			}
+
+
+			/*pawn[currentPawn].p_numPawnsInSpace = 0;
 			for (int i = 0; i < 4; i++)
 			{
 				if (pawn[currentPawn].p_currentTileNum == pawn[i].p_currentTileNum && currentPawn != i)
 					pawn[currentPawn].p_numPawnsInSpace++, pawn[i].p_numPawnsInSpace++;
 
-				pawn[i].currentForm = pawn[i].p_numPawnsInSpace;
-			}
+				pawn[i].p_currentForm = pawn[i].p_numPawnsInSpace;
+			}*/
 
 
 			//Moving more than one tile
-			if (pawn[currentPawn].p_currentPositionRect.x == board.tile[dest].x && pawn[currentPawn].p_currentPositionRect.y == board.tile[dest].y
+			if (pawn[currentPawn].p_currentPositionRect.x == board.tile[dest].rect.x && pawn[currentPawn].p_currentPositionRect.y == board.tile[dest].rect.y
 				&& rolled && dest != pawn[currentPawn].p_startingTileNum)
 			{
 				pawn[currentPawn].p_numTilesMoved++;
@@ -261,7 +287,7 @@ void Player::update(Board &board)
 				{
 					pawn[currentPawn].p_numTilesMoved = 0;
 					rolled = false;
-					isDone = true;
+					isDoneMoving = true;
 				}
 			}
 
@@ -270,7 +296,7 @@ void Player::update(Board &board)
 		case ENDINGTILE:
 			pawn[currentPawn].p_currentTileNum = 0;
 			pawn[currentPawn].p_status = HOME;
-			isDone = true;
+			isDoneMoving = true;
 			break;
 
 		case HOME:
@@ -284,6 +310,7 @@ void Player::update(Board &board)
 					{
 						numPawnsOut--;
 						pawn[currentPawn].p_status = DONE;
+						pawn[currentPawn].canMove = false;
 
 						if (numPawnsOut == 1)
 							for (int i = 0; i < 4; i++)
@@ -307,7 +334,7 @@ void Player::update(Board &board)
 						{
 							pawn[currentPawn].p_numTilesMoved = 0;
 							rolled = false;
-							isDone = true;
+							isDoneMoving = true;
 						}
 					}
 					break;
@@ -320,6 +347,7 @@ void Player::update(Board &board)
 					{
 						numPawnsOut--;
 						pawn[currentPawn].p_status = DONE;
+						pawn[currentPawn].canMove = false;
 
 						if (numPawnsOut == 1)
 							for (int i = 0; i < 4; i++)
@@ -343,7 +371,7 @@ void Player::update(Board &board)
 						{
 							pawn[currentPawn].p_numTilesMoved = 0;
 							rolled = false;
-							isDone = true;
+							isDoneMoving = true;
 						}
 					}
 					break;
