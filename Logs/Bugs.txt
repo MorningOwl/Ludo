@@ -2,7 +2,4 @@ BUGS
 
 
 1.Multiple pawn sprites don't display when on the same tile.
-2.Captured pawn is still currentPawn and escapes on rolling die*
-3.Highlighting pawns when choosing*
-4.Turn is disrupted when a player's last pawn is about to reach end.
-5.Players constantly roll 6 after choosing a pawn.
+2.Turn is disrupted when a player's last pawn is about to reach end.

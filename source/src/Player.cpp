@@ -9,8 +9,9 @@ Player::Player(Board &board, char colour) : colour(colour)
 	numPawnsOut = 0;
 	numPawnsHome = 4;
 	rolled = false;
+	roll = 1;
 	currentPawn = -1;
-	choosing = false;
+	isChoosing = false;
 	isDoneMoving = false;
 
 	switch (colour)
@@ -20,6 +21,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			pawn[1].p_startingPointRect = { 135, 490, 40, 40 };
 			pawn[2].p_startingPointRect = { 65, 425, 40, 40 };
 			pawn[3].p_startingPointRect = { 135, 425, 40, 40 };
+			diceRect = { 197, 557, 35, 35 };
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -38,6 +40,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			pawn[1].p_startingPointRect = { 490, 135, 40, 40 };
 			pawn[2].p_startingPointRect = { 425, 65, 40, 40 };
 			pawn[3].p_startingPointRect = { 425, 135, 40, 40 };
+			diceRect = { 368, 8, 35, 35 };
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -81,8 +84,15 @@ void Player::rollDie(Board &board, int roll)
 	this->roll = (roll == NULL) ? 1 + rand() % 6 : roll;
 	rolled = true;
 
+	if ((roll == NULL && (numPawnsOut == 0 || numPawnsOut > 1 || (this->roll == 6 && numPawnsHome > 0))))
+	{
+		tempRoll = roll;
+		isChoosing = true;
+		return;
+	}
+
 	for (int i = 0; i < 4; i++)
-		if (pawn[i].p_status != DONE)
+		if (pawn[i].p_status == OUT || pawn[i].p_status == HOME)
 			pawn[i].canMove = true;
 
 	switch (pawn[currentPawn].p_status)
@@ -113,7 +123,7 @@ void Player::rollDie(Board &board, int roll)
 						break;
 
 					default:
-						choosing = true;
+						isChoosing = true;
 						rolled = false;
 						return;
 				}
@@ -274,7 +284,7 @@ void Player::update(Board &board)
 
 			//Moving more than one tile
 			if (pawn[currentPawn].p_currentPositionRect.x == board.tile[dest].rect.x && pawn[currentPawn].p_currentPositionRect.y == board.tile[dest].rect.y
-				&& rolled && dest != pawn[currentPawn].p_startingTileNum)
+				&& rolled && dest != pawn[currentPawn].p_startingTileNum && !isChoosing)
 			{
 				pawn[currentPawn].p_numTilesMoved++;
 				if (pawn[currentPawn].p_numTilesMoved < roll)

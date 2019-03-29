@@ -1,7 +1,11 @@
 TO DO
 
 
-1.Add visual dice.
-2.Fix update times*
-3.Add 6-roll perks.
-4.Finish main game mechanics.
+1.Fix update times*
+2.Add 6-roll perks.
+
+
+
+-AFTER MAIN MECHANICS ARE COMPLETE
+1.Polish the rolling process.
+2.Add more players.

@@ -171,6 +171,7 @@
     <Text Include="Logs\To do.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Images\Dice.png" />
     <Image Include="Images\Finish.png" />
     <Image Include="Images\Pawns.png" />
   </ItemGroup>

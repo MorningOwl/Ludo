@@ -8,6 +8,8 @@
 
 enum Turn { PLAYER1, PLAYER2 };
 Turn turn = PLAYER1;
+enum State { ROLLING, CHOOSING };
+State state = ROLLING;
 
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
@@ -60,34 +62,6 @@ int main(int argc, char *argv[])
 							close();
 							return 0;
 
-						case SDLK_z:
-							if (turn == PLAYER1)
-							{
-								if (p1.numPawnsOut == 0 || p1.numPawnsOut > 1 || (p1.roll == 6 && p1.numPawnsHome > 0))
-								{
-									p1.tempRoll = p1.roll;
-									p1.choosing = true;
-									break;
-								}
-
-								p1.rollDie(board);
-							}
-							break;
-
-						case SDLK_x:
-							if (turn == PLAYER2)
-							{
-								if (p2.numPawnsOut == 0 || p2.numPawnsOut > 1 || (p2.roll == 6 && p2.numPawnsHome > 0))
-								{
-									p2.tempRoll = p2.roll;
-									p2.choosing = true;
-									break;
-								}
-
-								p2.rollDie(board);
-							}
-							break;
-
 						case SDLK_c:
 							for (int i = 0; i < 4; i++)
 								if (p2.pawn[i].p_status == OUT || p1.pawn[i].p_status == OUT)
@@ -97,47 +71,76 @@ int main(int argc, char *argv[])
 					break;
 
 				case SDL_MOUSEBUTTONDOWN:
-					if (turn == PLAYER1 && p1.choosing)
+					switch (state)
 					{
-						SDL_GetMouseState(&x, &y);
-						for (int i = 0; i < 4; i++)
-						{
-							if (x >= p1.pawn[i].p_currentPositionRect.x && x <= p1.pawn[i].p_currentPositionRect.x + p1.pawn[i].p_currentPositionRect.w
-								&& y >= p1.pawn[i].p_currentPositionRect.y && y <= p1.pawn[i].p_currentPositionRect.y + p1.pawn[i].p_currentPositionRect.h)
+						case ROLLING:
+							SDL_GetMouseState(&x, &y);
+							if (turn == PLAYER1 && x > p1.diceRect.x && x < p1.diceRect.x + p1.diceRect.w
+								&& y > p1.diceRect.y && y < p1.diceRect.y + p1.diceRect.h)
 							{
-								if (p1.pawn[i].canMove)
-									p1.currentPawn = i;
-
-								p1.choosing = false;
-								break;
+								p1.rollDie(board);
+								if (p1.isChoosing)
+									state = CHOOSING;
 							}
-						}
 
-						if (p1.currentPawn > -1)
-							p1.rollDie(board, p1.tempRoll);
-					}
-
-					else if (turn == PLAYER2 && p2.choosing)
-					{
-						SDL_GetMouseState(&x, &y);
-						for (int i = 0; i < 4; i++)
-						{
-							if (x >= p2.pawn[i].p_currentPositionRect.x && x <= p2.pawn[i].p_currentPositionRect.x + p2.pawn[i].p_currentPositionRect.w
-								&& y >= p2.pawn[i].p_currentPositionRect.y && y <= p2.pawn[i].p_currentPositionRect.y + p2.pawn[i].p_currentPositionRect.h)
+							else
+							if (turn == PLAYER2 && x > p2.diceRect.x && x < p2.diceRect.x + p2.diceRect.w
+								&& y > p2.diceRect.y && y < p2.diceRect.y + p2.diceRect.h)
 							{
-								if (p2.pawn[i].canMove)
-									p2.currentPawn = i;
-
-								p2.choosing = false;
-								break;
+								p2.rollDie(board);
+								if (p2.isChoosing)
+									state = CHOOSING;
 							}
-						}
 
-						if (p2.currentPawn > -1)
-							p2.rollDie(board, p2.tempRoll);
+							break;
+
+						case CHOOSING:
+							if (p1.isChoosing)
+							{
+								p1.currentPawn = -1;
+								SDL_GetMouseState(&x, &y);
+								for (int i = 0; i < 4; i++)
+								{
+									if (x >= p1.pawn[i].p_currentPositionRect.x && x <= p1.pawn[i].p_currentPositionRect.x + p1.pawn[i].p_currentPositionRect.w
+										&& y >= p1.pawn[i].p_currentPositionRect.y && y <= p1.pawn[i].p_currentPositionRect.y + p1.pawn[i].p_currentPositionRect.h)
+									{
+										if (p1.pawn[i].canMove)
+											p1.currentPawn = i;
+
+										p1.isChoosing = false;
+										state = ROLLING;
+										break;
+									}
+								}
+
+								if (p1.currentPawn > -1)
+									p1.rollDie(board, p1.roll);
+							}
+
+							else if (p2.isChoosing)
+							{
+								p2.currentPawn = -1;
+								SDL_GetMouseState(&x, &y);
+								for (int i = 0; i < 4; i++)
+								{
+									if (x >= p2.pawn[i].p_currentPositionRect.x && x <= p2.pawn[i].p_currentPositionRect.x + p2.pawn[i].p_currentPositionRect.w
+										&& y >= p2.pawn[i].p_currentPositionRect.y && y <= p2.pawn[i].p_currentPositionRect.y + p2.pawn[i].p_currentPositionRect.h)
+									{
+										if (p2.pawn[i].canMove)
+											p2.currentPawn = i;
+
+										p2.isChoosing = false;
+										state = ROLLING;
+										break;
+									}
+								}
+
+								if (p2.currentPawn > -1)
+									p2.rollDie(board, p2.roll);
+							}
+
+							break;
 					}
-
-					break;
 			}
 		}
 
@@ -150,7 +153,7 @@ int main(int argc, char *argv[])
 		drawBoard();
 
 		//Highlight pawns
-		if (p1.choosing)
+		if (p1.isChoosing)
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0xFF, 0xFF);
 			for (int i = 0; i < 4; i++)
@@ -158,7 +161,7 @@ int main(int argc, char *argv[])
 					SDL_RenderDrawRect(renderer, &p1.pawn[i].p_currentPositionRect);
 		}
 
-		else if (p2.choosing)
+		else if (p2.isChoosing)
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0, 0);
 			for (int i = 0; i < 4; i++)

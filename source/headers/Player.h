@@ -15,11 +15,13 @@ class Player
 		int numPawnsOut;
 		int numPawnsHome;
 
+		SDL_Rect diceRect;
+
 		int roll, tempRoll;
 		char colour;
 
 		bool rolled;
 		int currentPawn;
-		bool choosing;
+		bool isChoosing;
 		bool isDoneMoving;
 };
