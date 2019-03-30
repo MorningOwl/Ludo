@@ -83,6 +83,12 @@ Board::Board()
 	greenStartSquares[1] = { 490, 135, 40, 40 };
 	greenStartSquares[2] = { 425, 65, 40, 40 };
 	greenStartSquares[3] = { 425, 135, 40, 40 };
+
+
+	//Number of Pawns on a Tile
+	for (int i = 0; i < 52; i++)
+		for (int j = 0; j < 4; j++)
+			tile[i].numPawns[j] = 0;
 }
 
 void Board::draw(SDL_Renderer *renderer)

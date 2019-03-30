@@ -3,7 +3,7 @@ TO DO
 
 1.Fix update times*
 2.Add 6-roll perks.
-
+3.Add safe zones.
 
 
 -AFTER MAIN MECHANICS ARE COMPLETE

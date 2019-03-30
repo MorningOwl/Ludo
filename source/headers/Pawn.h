@@ -3,6 +3,7 @@
 
 enum Status { START, OUT, ENDINGTILE, HOME, DONE };
 
+
 class Pawn
 {
 	public:

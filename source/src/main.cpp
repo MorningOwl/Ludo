@@ -105,11 +105,12 @@ int main(int argc, char *argv[])
 										&& y >= p1.pawn[i].p_currentPositionRect.y && y <= p1.pawn[i].p_currentPositionRect.y + p1.pawn[i].p_currentPositionRect.h)
 									{
 										if (p1.pawn[i].canMove)
+										{
 											p1.currentPawn = i;
-
-										p1.isChoosing = false;
-										state = ROLLING;
-										break;
+											p1.isChoosing = false;
+											state = ROLLING;
+											break;
+										}
 									}
 								}
 
@@ -127,11 +128,12 @@ int main(int argc, char *argv[])
 										&& y >= p2.pawn[i].p_currentPositionRect.y && y <= p2.pawn[i].p_currentPositionRect.y + p2.pawn[i].p_currentPositionRect.h)
 									{
 										if (p2.pawn[i].canMove)
+										{
 											p2.currentPawn = i;
-
-										p2.isChoosing = false;
-										state = ROLLING;
-										break;
+											p2.isChoosing = false;
+											state = ROLLING;
+											break;
+										}
 									}
 								}
 
@@ -216,50 +218,6 @@ int main(int argc, char *argv[])
 }
 
 
-void initBoard()
-{
-	for (int i = 0; i < 4; i++)
-	{
-		switch (p1.colour)
-		{
-			case 'b':
-				p1.pawn[i].p_form[0] = { 0, 0, 40, 40 };
-				p1.pawn[i].p_form[1] = { 0, 40, 40, 40 };
-				p1.pawn[i].p_form[2] = { 0, 80, 40, 40 };
-				p1.pawn[i].p_form[3] = { 0, 120, 40, 40 };
-				p1.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
-				break;
-
-			case 'g':
-				p1.pawn[i].p_form[0] = { 80, 0, 40, 40 };
-				p1.pawn[i].p_form[1] = { 80, 40, 40, 40 };
-				p1.pawn[i].p_form[2] = { 80, 80, 40, 40 };
-				p1.pawn[i].p_form[3] = { 80, 120, 40, 40 };
-				p1.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
-				break;
-		}
-		
-		switch (p2.colour)
-		{
-			case 'b':
-				p2.pawn[i].p_form[0] = { 0, 0, 40, 40 };
-				p2.pawn[i].p_form[1] = { 0, 40, 40, 40 };
-				p2.pawn[i].p_form[2] = { 0, 80, 40, 40 };
-				p2.pawn[i].p_form[3] = { 0, 120, 40, 40 };
-				p2.pawn[i].p_currentPositionRect = board.blueStartSquares[i];
-				break;
-
-			case 'g':
-				p2.pawn[i].p_form[0] = { 80, 0, 40, 40 };
-				p2.pawn[i].p_form[1] = { 80, 40, 40, 40 };
-				p2.pawn[i].p_form[2] = { 80, 80, 40, 40 };
-				p2.pawn[i].p_form[3] = { 80, 120, 40, 40 };
-				p2.pawn[i].p_currentPositionRect= board.greenStartSquares[i];
-				break;
-		}
-	}
-}
-
 bool init()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -272,13 +230,9 @@ bool init()
 		return false;
 
 	window = SDL_CreateWindow("Ludo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_SHOWN);
-	if (window == NULL) return false;
-
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == NULL) return false;
 
-	initBoard();
-	return true;
+	return window != NULL && renderer != NULL;
 }
 
 bool loadMedia()

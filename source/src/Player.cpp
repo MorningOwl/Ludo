@@ -4,7 +4,7 @@
 #include <ctime>
 
 
-Player::Player(Board &board, char colour) : colour(colour)
+Player::Player(Board &board, char colour) : colourKey(colour)
 {
 	numPawnsOut = 0;
 	numPawnsHome = 4;
@@ -22,6 +22,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			pawn[2].p_startingPointRect = { 65, 425, 40, 40 };
 			pawn[3].p_startingPointRect = { 135, 425, 40, 40 };
 			diceRect = { 197, 557, 35, 35 };
+			colour = BLUE;
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -31,6 +32,12 @@ Player::Player(Board &board, char colour) : colour(colour)
 
 				for (int j = 0; j < 6; j++)
 					pawn[i].p_home[j] = board.blueHome[j];
+
+				pawn[i].p_form[0] = { 0, 0, 40, 40 };
+				pawn[i].p_form[1] = { 0, 40, 40, 40 };
+				pawn[i].p_form[2] = { 0, 80, 40, 40 };
+				pawn[i].p_form[3] = { 0, 120, 40, 40 };
+				pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 			}
 
 			break;
@@ -41,6 +48,7 @@ Player::Player(Board &board, char colour) : colour(colour)
 			pawn[2].p_startingPointRect = { 425, 65, 40, 40 };
 			pawn[3].p_startingPointRect = { 425, 135, 40, 40 };
 			diceRect = { 368, 8, 35, 35 };
+			colour = GREEN;
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -50,6 +58,12 @@ Player::Player(Board &board, char colour) : colour(colour)
 
 				for (int j = 0; j < 5; j++)
 					pawn[i].p_home[j] = board.greenHome[j];
+
+				pawn[i].p_form[0] = { 80, 0, 40, 40 };
+				pawn[i].p_form[1] = { 80, 40, 40, 40 };
+				pawn[i].p_form[2] = { 80, 80, 40, 40 };
+				pawn[i].p_form[3] = { 80, 120, 40, 40 };
+				pawn[i].p_currentPositionRect = board.blueStartSquares[i];
 			}
 
 			break;
@@ -86,14 +100,18 @@ void Player::rollDie(Board &board, int roll)
 
 	if ((roll == NULL && (numPawnsOut == 0 || numPawnsOut > 1 || (this->roll == 6 && numPawnsHome > 0))))
 	{
-		tempRoll = roll;
 		isChoosing = true;
 		return;
 	}
 
 	for (int i = 0; i < 4; i++)
-		if (pawn[i].p_status == OUT || pawn[i].p_status == HOME)
+	{
+		if (pawn[i].p_status == HOME && pawn[i].p_currentTileNum + this->roll > 5)
+			pawn[i].canMove = false;
+
+		else if (pawn[i].p_status == OUT || pawn[i].p_status == HOME)
 			pawn[i].canMove = true;
+	}
 
 	switch (pawn[currentPawn].p_status)
 	{
@@ -193,13 +211,13 @@ void Player::update(Board &board)
 
 					else
 					{*/
-						pawn[i].p_currentPositionRect = pawn[i].p_startingPointRect;
-						pawn[i].p_currentTileNum = -1;
-						pawn[i].wasCaptured = false;
-						pawn[i].p_status = START;
-						numPawnsOut--;
-						numPawnsHome++;
-						return;
+					pawn[i].p_currentPositionRect = pawn[i].p_startingPointRect;
+					pawn[i].p_currentTileNum = -1;
+					pawn[i].wasCaptured = false;
+					pawn[i].p_status = START;
+					numPawnsOut--;
+					numPawnsHome++;
+					return;
 					//}
 				}
 
@@ -251,35 +269,33 @@ void Player::update(Board &board)
 					pawn[currentPawn].p_currentPositionRect.y += 10;
 			}
 
+
 			//Reset tile number of pawn if it crosses the last tile
 			else if (dest >= board.numTiles)
 				pawn[currentPawn].p_currentTileNum = 0;
 
+
 			//Render more than one pawn in a space
 			for (int i = 0; i < 52; i++)
-				for (int j = 0; j < 4; j++)
-					board.tile[i].numPawns[j] = 0;
+				board.tile[i].numPawns[colour] = 0;
 
-			for (int i = 0; i < 4 && pawn[i].p_status == OUT; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				for (int j = 0; j < 52; j++)
 				{
 					if (pawn[i].p_currentTileNum == board.tile[j].index)
-						board.tile[j].numPawns[pawn[i].p_colourNum]++;
+					{
+						board.tile[j].numPawns[colour]++;
+						break;
+					}
 				}
-
-				pawn[i].p_currentForm = board.tile[pawn[i].p_currentTileNum].numPawns[pawn[i].p_colourNum];
 			}
 
-
-			/*pawn[currentPawn].p_numPawnsInSpace = 0;
 			for (int i = 0; i < 4; i++)
-			{
-				if (pawn[currentPawn].p_currentTileNum == pawn[i].p_currentTileNum && currentPawn != i)
-					pawn[currentPawn].p_numPawnsInSpace++, pawn[i].p_numPawnsInSpace++;
-
-				pawn[i].p_currentForm = pawn[i].p_numPawnsInSpace;
-			}*/
+				if (pawn[i].p_status == OUT)
+					pawn[i].p_currentForm = board.tile[pawn[i].p_currentTileNum].numPawns[colour] - 1;
+				else if (pawn[i].p_status == START)
+					pawn[i].p_currentForm = 0;
 
 
 			//Moving more than one tile
